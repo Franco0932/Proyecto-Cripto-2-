@@ -1,0 +1,7 @@
+Librerias a usar
+
+pip install liboqs
+pip install pqcrypto
+pip install cryptography
+pip install numpy
+pip install matplotlib
