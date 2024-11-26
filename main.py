@@ -19,7 +19,7 @@ def main():
     
     # Generar gráfico de rendimiento
     generate_performance_graph()
-    print("\nPerformance graph generated: performance_graph.png")
+    print("\nGeneración de gráficos: performance_graph.png")
 
 if __name__ == "__main__":
     main()
