@@ -1,0 +1,13 @@
+Proyecto Cripto 2/
+│
+├── src/
+│   ├── __init__.py
+│   ├── ml_kem.py
+│   ├── ml_dsa.py
+│   ├── slh_dsa.py
+│   └── performance_tests.py
+|
+├── readme.txt
+└── main.py
+
+Estructura del proyecto
