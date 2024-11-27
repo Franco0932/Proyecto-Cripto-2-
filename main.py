@@ -7,15 +7,15 @@ def main():
     # Demostración de algoritmos
     print("ML-KEM Key Generation:")
     public_key = ml_kem_key_generation()
-    print(f"Public Key Length: {len(public_key)} bytes")
+    print(f"Tamaño de la llave pública: {len(public_key)} bytes")
     
     print("\nML-DSA Signature:")
     public_key, signature = ml_dsa_sign("Hello, Post-Quantum World!")
-    print(f"Signature Length: {len(signature)} bytes")
+    print(f"Tamaño de la Firma: {len(signature)} bytes")
     
     print("\nSLH-DSA Signature:")
     public_key, signature = slh_dsa_sign("Stateless Hash-Based Signature")
-    print(f"Signature Length: {len(signature)} bytes")
+    print(f"Tamaño de la Firma: {len(signature)} bytes")
     
     # Generar gráfico de rendimiento
     generate_performance_graph()
