@@ -1,25 +1,26 @@
-from src.ml_kem import ml_kem_key_generation, ml_kem_encapsulation
-from src.ml_dsa import ml_dsa_sign
-from src.slh_dsa import slh_dsa_sign
+# Archivo main.py
+from src.ml_kem import prueba_rendimiento_ml_kem
+from src.ml_dsa import ml_dsa
 from src.performance_tests import generate_performance_graph
 
 def main():
-    # Demostración de algoritmos
-    print("ML-KEM Key Generation:")
-    public_key = ml_kem_key_generation()
-    print(f"Tamaño de la llave pública: {len(public_key)} bytes")
+    print("Demostrando algoritmos criptográficos post-cuánticos\n")
     
-    print("\nML-DSA Signature:")
-    public_key, signature = ml_dsa_sign("Hello, Post-Quantum World!")
-    print(f"Tamaño de la Firma: {len(signature)} bytes")
-    
-    print("\nSLH-DSA Signature:")
-    public_key, signature = slh_dsa_sign("Stateless Hash-Based Signature")
-    print(f"Tamaño de la Firma: {len(signature)} bytes")
-    
+     # Demostración ML-KEM
+    print("ML-KEM - Prueba de Rendimiento:")
+    resultado_kem = prueba_rendimiento_ml_kem('Kyber768', iteraciones=100)
+    if resultado_kem:
+        print(f"Resultados: {resultado_kem}")
+    else:
+        print("No se pudo ejecutar la prueba de ML-KEM.")
+
+    # Demostración ML-DSA
+    print("ML-DSA - Firma Digital:")
+    ml_dsa()  # Ejecuta toda la demostración de ML-DSA
+
     # Generar gráfico de rendimiento
     generate_performance_graph()
-    print("\nGeneración de gráficos: performance_graph.png")
+    print("\nSe han generado los gráficos de rendimiento.")
 
 if __name__ == "__main__":
     main()

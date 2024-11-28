@@ -1,74 +1,50 @@
-#Archivo para el desarrollo de ML-KEM con pruebas de rendimiento
-import oqs
+# Archivo ml_kem.py
 import time
 import numpy as np
-import matplotlib.pyplot as plt
+from kyber import Kyber512
 
-def prueba_rendimiento_ml_kem(algoritmo='ML-KEM-768', iteraciones=100):
-    
-    #Realización de pruebas de rendimiento para encapsulamiento y desencapsulamiento de ML-KEM
+def prueba_rendimiento_ml_kem(iteraciones=100):
+    """Realiza pruebas de rendimiento para Kyber512."""
     try:
-        #Listas para almacenar los tiempos de ejecución
+        # Listas para almacenar los tiempos
         tiempos_encapsulamiento = []
         tiempos_desencapsulamiento = []
-        
-        #Realizar pruebas para cada iteración
+
         for _ in range(iteraciones):
-            kem = oqs.KEM(algoritmo)
-            
-            #Generación de claves (pública y privada)
-            clave_publica, clave_privada = kem.generate_keypair()
-            
-            #Medir tiempo de encapsulamiento
+            # Generar claves pública y privada
+            clave_publica, clave_privada = Kyber512.keygen()
+
+            # Medir tiempo de encapsulamiento
             inicio = time.time()
-            ciphertext, secreto_compartido_emisor = kem.encap(clave_publica)
+            ciphertext, secreto_compartido_emisor = Kyber512.enc(clave_publica)
             tiempo_encapsulamiento = time.time() - inicio
             tiempos_encapsulamiento.append(tiempo_encapsulamiento)
-            
-            #Medir tiempo de desencapsulamiento
+
+            # Medir tiempo de desencapsulamiento
             inicio = time.time()
-            secreto_compartido_receptor = kem.decap(ciphertext, clave_privada)
+            secreto_compartido_receptor = Kyber512.dec(ciphertext, clave_privada)
             tiempo_desencapsulamiento = time.time() - inicio
             tiempos_desencapsulamiento.append(tiempo_desencapsulamiento)
-            
-            #Verificacion de que los secretos compartidos coincidan
-            assert secreto_compartido_emisor == secreto_compartido_receptor, "No hay coincidencia"
-        
-        #Calculo de estadísticas de rendimiento
+
+            # Verificar que los secretos compartidos coincidan
+            if secreto_compartido_emisor != secreto_compartido_receptor:
+                raise ValueError("No hay coincidencia")
+
+        # Calcular estadísticas de rendimiento
         promedio_encapsulamiento = np.mean(tiempos_encapsulamiento)
         desviacion_encapsulamiento = np.std(tiempos_encapsulamiento)
         promedio_desencapsulamiento = np.mean(tiempos_desencapsulamiento)
         desviacion_desencapsulamiento = np.std(tiempos_desencapsulamiento)
-        
-        #resultados
-        print(f"\nAnálisis de Rendimiento ML-KEM ({algoritmo}):")
-        print(f"Encapsulamiento - Tiempo Promedio: {promedio_encapsulamiento:.6f} segundos (±{desviacion_encapsulamiento:.6f})")
-        print(f"Desencapsulamiento - Tiempo Promedio: {promedio_desencapsulamiento:.6f} segundos (±{desviacion_desencapsulamiento:.6f})")
-        
-        #Gráficos de rendimiento
-        plt.figure(figsize=(10, 6))
-        datos_rendimiento = [promedio_encapsulamiento, promedio_desencapsulamiento]
-        desviaciones = [desviacion_encapsulamiento, desviacion_desencapsulamiento]
-        operaciones = ['Encapsulamiento', 'Desencapsulamiento']
-        
-        plt.bar(operaciones, datos_rendimiento, yerr=desviaciones, capsize=10)
-        plt.title(f'Rendimiento ML-KEM: {algoritmo}')
-        plt.ylabel('Tiempo de Ejecución (segundos)')
-        plt.tight_layout()
-        plt.savefig('grafico_rendimiento_ml_kem.png')
-        plt.close()
-        
+
+        print(f"\nAnálisis de Rendimiento Kyber512:")
+        print(f"Encapsulamiento - Promedio: {promedio_encapsulamiento:.6f} s, Desviación: {desviacion_encapsulamiento:.6f} s")
+        print(f"Desencapsulamiento - Promedio: {promedio_desencapsulamiento:.6f} s, Desviación: {desviacion_desencapsulamiento:.6f} s")
+
         return (promedio_encapsulamiento, desviacion_encapsulamiento), (promedio_desencapsulamiento, desviacion_desencapsulamiento)
-    
+
     except Exception as e:
-        print(f"Error durante la prueba de rendimiento de ML-KEM: {e}")
+        print(f"Error durante la prueba de rendimiento de Kyber512: {e}")
         return None
 
-def principal():
-    #Pruebas con diferentes niveles de seguridad
-    prueba_rendimiento_ml_kem('ML-KEM-512')
-    prueba_rendimiento_ml_kem('ML-KEM-768')
-    prueba_rendimiento_ml_kem('ML-KEM-1024')
-
 if __name__ == "__main__":
-    principal()
+    prueba_rendimiento_ml_kem(iteraciones=50)
