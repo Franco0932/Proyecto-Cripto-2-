@@ -36,8 +36,8 @@ def prueba_rendimiento_ml_kem(iteraciones=100):
         desviacion_desencapsulamiento = np.std(tiempos_desencapsulamiento)
 
         print(f"\nAnálisis de Rendimiento Kyber512:")
-        print(f"Encapsulamiento - Promedio: {promedio_encapsulamiento:.6f} s, Desviación: {desviacion_encapsulamiento:.6f} s")
-        print(f"Desencapsulamiento - Promedio: {promedio_desencapsulamiento:.6f} s, Desviación: {desviacion_desencapsulamiento:.6f} s")
+        print(f"Encapsulamiento - Promedio: {promedio_encapsulamiento:.6f}s, Desviación: {desviacion_encapsulamiento:.6f}s")
+        print(f"Desencapsulamiento - Promedio: {promedio_desencapsulamiento:.6f}s, Desviación: {desviacion_desencapsulamiento:.6f}s")
 
         return (promedio_encapsulamiento, desviacion_encapsulamiento), (promedio_desencapsulamiento, desviacion_desencapsulamiento)
 

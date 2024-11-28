@@ -1,5 +1,5 @@
 #Generacion de graficas
-# Archivo performance_tests.py
+#Archivo performance_tests.py
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -71,7 +71,7 @@ def generate_performance_graph():
     plt.close()
 
 def measure_performance(algorithm, iterations=100):
-    """Medir tiempo de ejecución de un algoritmo"""
+    #Medir tiempo de ejecución de un algoritmo
     times = []
     for _ in range(iterations):
         start = time.time()
