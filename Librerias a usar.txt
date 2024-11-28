@@ -5,3 +5,4 @@ pip install pqcrypto
 pip install cryptography
 pip install numpy
 pip install matplotlib
+pip install kyber-py
