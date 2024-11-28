@@ -6,3 +6,4 @@ pip install cryptography
 pip install numpy
 pip install matplotlib
 pip install kyber-py
+pip install lattice-cryptography
