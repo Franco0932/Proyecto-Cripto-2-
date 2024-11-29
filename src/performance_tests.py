@@ -1,80 +1,96 @@
 #Generacion de graficas
-#Archivo performance_tests.py
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from .ml_kem import prueba_rendimiento_ml_kem
-from .ml_dsa import ml_dsa_sign, ml_dsa_verify
-from .slh_dsa import slh_dsa_sign, slh_dsa_verify
+
+#Algoritmos necesarios
+from src.ml_kem import prueba_rendimiento_ml_kem
+from src.ml_dsa import ml_dsa_sign, ml_dsa_verify
+from src.slh_dsa import slh_dsa_sign, slh_dsa_verify
+
+def medir_rendimiento(algoritmo, iteraciones=100):
+    tiempos = []
+    for _ in range(iteraciones):
+        inicio = time.time()
+        algoritmo()
+        tiempos.append(time.time() - inicio)
+    return np.mean(tiempos), np.std(tiempos)
 
 def generate_performance_graph():
-    """Generar gráficos de rendimiento"""
+    #1.Rendimiento de Encapsulación vs Desencapsulación de ML-KEM
+    resultados_kem = prueba_rendimiento_ml_kem(iteraciones=100)
+    if resultados_kem:
+        (media_encapsulacion, desviacion_encapsulacion), (media_desencapsulacion, desviacion_desencapsulacion) = resultados_kem
 
-    # 1. Tiempos de Encapsulamiento vs Desencapsulamiento para ML-KEM
-    kem_results = prueba_rendimiento_ml_kem(iteraciones=100)
-    if kem_results:
-        (mean_encap, std_encap), (mean_decap, std_decap) = kem_results
-
-        plt.figure(figsize=(8, 5))
-        plt.bar(['Encapsulamiento', 'Desencapsulamiento'],
-                [mean_encap, mean_decap],
-                yerr=[std_encap, std_decap],
-                capsize=10, color=['blue', 'orange'])
-        plt.title('Tiempos ML-KEM: Encapsulamiento vs Desencapsulamiento')
-        plt.ylabel('Tiempo de Ejecución (segundos)')
+        plt.figure(figsize=(10, 6))
+        plt.bar(['Encapsulación', 'Desencapsulación'],
+                [media_encapsulacion, media_desencapsulacion],
+                yerr=[desviacion_encapsulacion, desviacion_desencapsulacion],
+                capsize=10, 
+                color=['blue', 'orange'])
+        plt.title('Rendimiento ML-KEM: Encapsulación vs Desencapsulación', fontsize=16)
+        plt.ylabel('Tiempo de Ejecución (segundos)', fontsize=12)
+        plt.xlabel('Operación', fontsize=12)
         plt.tight_layout()
-        plt.savefig('ml_kem_performance.png')
+        plt.savefig('rendimiento_ml_kem.png')
         plt.close()
+        print("Gráfico de rendimiento ML-KEM generado exitosamente.")
 
-    # 2. Comparación de Tiempos de Firma entre SLH-DSA y ML-DSA
-    sign_algorithms = {
+    #2.Comparación de Rendimiento de Firma
+    algoritmos_firma = {
         'ML-DSA': ml_dsa_sign,
         'SLH-DSA': slh_dsa_sign
     }
 
-    sign_means = []
-    sign_stds = []
+    medias_firma = []
+    desviaciones_firma = []
 
-    for name, algo in sign_algorithms.items():
-        mean, std = measure_performance(algo, iterations=100)
-        sign_means.append(mean)
-        sign_stds.append(std)
+    for nombre, algoritmo in algoritmos_firma.items():
+        media, desviacion = medir_rendimiento(algoritmo, iteraciones=100)
+        medias_firma.append(media)
+        desviaciones_firma.append(desviacion)
 
-    plt.figure(figsize=(8, 5))
-    plt.bar(sign_algorithms.keys(), sign_means, yerr=sign_stds, capsize=10, color=['green', 'purple'])
-    plt.title('Comparación de Tiempos de Firma: SLH-DSA vs ML-DSA')
-    plt.ylabel('Tiempo de Ejecución (segundos)')
+    plt.figure(figsize=(10, 6))
+    plt.bar(algoritmos_firma.keys(), medias_firma, yerr=desviaciones_firma, capsize=10, color=['green', 'purple'])
+    plt.title('Rendimiento de Firma: SLH-DSA vs ML-DSA', fontsize=16)
+    plt.ylabel('Tiempo de Ejecución (segundos)', fontsize=12)
+    plt.xlabel('Algoritmo', fontsize=12)
     plt.tight_layout()
-    plt.savefig('signature_performance.png')
+    plt.savefig('rendimiento_firma.png')
     plt.close()
+    print("Gráfico de rendimiento de firma generado exitosamente.")
 
-    # 3. Comparación de Tiempos de Verificación entre SLH-DSA y ML-DSA
-    verify_algorithms = {
+    #3.Comparación de Rendimiento de Verificación
+    algoritmos_verificacion = {
         'ML-DSA': ml_dsa_verify,
         'SLH-DSA': slh_dsa_verify
     }
 
-    verify_means = []
-    verify_stds = []
+    medias_verificacion = []
+    desviaciones_verificacion = []
 
-    for name, algo in verify_algorithms.items():
-        mean, std = measure_performance(algo, iterations=100)
-        verify_means.append(mean)
-        verify_stds.append(std)
+    for nombre, algoritmo in algoritmos_verificacion.items():
+        if nombre == 'ML-DSA':
+            parametros_publicos, clave_verificacion, firma, mensaje = ml_dsa_sign()
+            funcion_verificacion = lambda: ml_dsa_verify(parametros_publicos, clave_verificacion, firma, mensaje)
+        else:
+            funcion_verificacion = slh_dsa_verify
 
-    plt.figure(figsize=(8, 5))
-    plt.bar(verify_algorithms.keys(), verify_means, yerr=verify_stds, capsize=10, color=['cyan', 'magenta'])
-    plt.title('Comparación de Tiempos de Verificación: SLH-DSA vs ML-DSA')
-    plt.ylabel('Tiempo de Ejecución (segundos)')
+        media, desviacion = medir_rendimiento(funcion_verificacion, iteraciones=100)
+        medias_verificacion.append(media)
+        desviaciones_verificacion.append(desviacion)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(algoritmos_verificacion.keys(), medias_verificacion, 
+            yerr=desviaciones_verificacion, capsize=10, color=['cyan', 'magenta'])
+    plt.title('Rendimiento de Verificación: SLH-DSA vs ML-DSA', fontsize=16)
+    plt.ylabel('Tiempo de Ejecución (segundos)', fontsize=12)
+    plt.xlabel('Algoritmo', fontsize=12)
     plt.tight_layout()
-    plt.savefig('verification_performance.png')
+    plt.savefig('rendimiento_verificacion.png')
     plt.close()
+    print("Gráfico de rendimiento de verificación generado exitosamente.")
 
-def measure_performance(algorithm, iterations=100):
-    #Medir tiempo de ejecución de un algoritmo
-    times = []
-    for _ in range(iterations):
-        start = time.time()
-        algorithm()
-        times.append(time.time() - start)
-    return np.mean(times), np.std(times)
+if __name__ == "__main__":
+    generate_performance_graph()
+    print("Se han generado todos los gráficos de rendimiento.")
